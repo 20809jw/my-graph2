@@ -13,8 +13,8 @@ def load_data():
     url = "https://raw.githubusercontent.com/greatsong/modudata/main/data/kobis_movies.csv"
     df = pd.read_csv(url)
     
-    # 장르 열 전처리: 세로막대 기호(|)로 분리하여 첫 번째 장르만 추출
-    df['genre'] = df['genre'].astype(str).apply(lambda x: x.split('|')[0] if x != 'nan' else '기타')
+    # 장르 열 전처리: '|' 구분자로 나눈 후 첫 번째 장르만 추출 (결측치는 '기타'로 채움)
+    df['genre'] = df['genre'].fillna('기타').astype(str).str.split('|').str[0]
     return df
 
 df = load_data()
@@ -49,10 +49,10 @@ st.plotly_chart(fig_donut, use_container_width=True)
 
 # 그래프 해석 구역
 st.subheader("💡 이 그래프로 알 수 있는 것")
-st.info("박스오피스 상위권 영화 중 특정 장르(예: 드라마다 드라마/액션 등)의 비중이 얼마나 높은지 전체적인 분포 형태를 확인할 수 있습니다.")
+st.info("박스오피스 상위권 영화 중 특정 장르의 비중이 얼마나 높은지 전체적인 분포 형태를 확인할 수 있습니다.")
 
 st.divider()
 
-# 데이터 프레임 미리보기 (선택 사항)
+# 데이터 프레임 미리보기
 with st.expander("원본 데이터 보기"):
     st.dataframe(df)
