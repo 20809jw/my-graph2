@@ -225,19 +225,21 @@ st.info("네 번째 그래프에 '개봉 첫 주 관객 수'라는 변수를 버
 st.divider()
 
 # ==============================================================================
-# Section 7: 제작 국가 및 장르별 영화 편수 (선버스트 그래프)
+# Section 7: 제작 국가 및 장르별 영화 편수 (선버스트)
 # ==============================================================================
 st.header("7. 제작 국가 및 장르별 영화 편수 (선버스트)")
 
-# 선버스트 그래프 생성 (계층 구조: nation -> genre)
+# 계층 구조 표현을 위해 국가 및 장르별로 영화 편수 사전 집계
+sunburst_df = df.groupby(['nation', 'genre']).size().reset_index(name='count')
+
 fig_sunburst = px.sunburst(
-    df,
+    sunburst_df,
     path=['nation', 'genre'],
-    title="제작 국가 및 장르별 영화 편수 (칸 크기: 영화 편수)",
-    color='nation'
+    values='count',
+    color='nation',
+    title="제작 국가 및 장르별 영화 편수 (칸 크기: 영화 편수)"
 )
 
-# 마우스 오버 툴팁 포맷 설정 (편수 및 비율 표시)
 fig_sunburst.update_traces(
     hovertemplate="<b>국가/장르: %{label}</b><br>영화 편수: %{value}편<br>상위 항목 대비 비율: %{percentParent:.1%}"
 )
