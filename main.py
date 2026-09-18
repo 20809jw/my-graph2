@@ -229,7 +229,6 @@ st.divider()
 # ==============================================================================
 st.header("7. 제작 국가 및 장르별 영화 편수 (선버스트)")
 
-# 계층 구조 표현을 위해 국가 및 장르별로 영화 편수 사전 집계
 sunburst_df = df.groupby(['nation', 'genre']).size().reset_index(name='count')
 
 fig_sunburst = px.sunburst(
@@ -248,6 +247,46 @@ st.plotly_chart(fig_sunburst, use_container_width=True)
 
 st.subheader("💡 이 그래프로 알 수 있는 것")
 st.info("제작 국가별 영화 비중과 함께, 각 국가 내부에서 어떤 장르가 주로 주를 이루는지 동심원 형태의 계층 구조로 파악할 수 있습니다.")
+
+st.divider()
+
+# ==============================================================================
+# Section 8: 10위권 머문 날수와 관객 수의 관계 (산점도)
+# ==============================================================================
+st.header("8. 10위권에 오래 머문 영화는 총 관객도 많은가")
+
+# 질문 기반 산점도 생성
+fig_q8 = px.scatter(
+    df,
+    x='first_week_audi',
+    y='total_audi',
+    size='days_in_top10', # 점 크기로 10위권 머문 날수 표현
+    color='genre',
+    hover_name='movieNm',
+    size_max=50,
+    title="10위권에 오래 머문 영화는 총 관객도 많은가",
+    labels={
+        'first_week_audi': '개봉 첫 주 관객 수(명)',
+        'total_audi': '총 관객 수(명)',
+        'days_in_top10': '10위권에 머문 날수(일)',
+        'genre': '장르'
+    }
+)
+
+# 마우스 오버 툴팁 설정
+fig_q8.update_traces(
+    hovertemplate="<b>%{hovertext}</b><br>개봉 첫 주 관객 수: %{x:,}명<br>총 관객 수: %{y:,}명<br>10위권 머문 날수: %{marker.size}일"
+)
+
+fig_q8.update_layout(
+    xaxis_title="개봉 첫 주 관객 수 (명)",
+    yaxis_title="총 관객 수 (명)"
+)
+
+st.plotly_chart(fig_q8, use_container_width=True)
+
+st.subheader("💡 이 그래프로 알 수 있는 것")
+st.info("개봉 첫 주 관객 수와 총 관객 수는 매우 강한 양의 상관관계를 나타내며, 총 관객 수가 높을수록(Y축 상단) 10위권에 머문 날수(점의 크기)도 커져 장기 흥행과 높은 총 관객 수가 밀접하게 연관되어 있음을 알 수 있습니다.")
 
 st.divider()
 
