@@ -251,42 +251,45 @@ st.info("제작 국가별 영화 비중과 함께, 각 국가 내부에서 어�
 st.divider()
 
 # ==============================================================================
-# Section 8: 10위권 머문 날수와 관객 수의 관계 (산점도)
+# Section 8: 10위권 머문 기간별 총 관객 수 비교 (박스플롯)
 # ==============================================================================
 st.header("8. 10위권에 오래 머문 영화는 총 관객도 많은가")
 
-# 질문 기반 산점도 생성
-fig_q8 = px.scatter(
+# 10위권 머문 날수를 범주형 구간(Group)으로 나누기
+bins = [-1, 9, 19, 29, 999]
+labels = ['10일 미만', '10일~20일 미만', '20일~30일 미만', '30일 이상']
+df['top10_group'] = pd.cut(df['days_in_top10'], bins=bins, labels=labels)
+
+# 박스플롯 생성
+fig_q8 = px.box(
     df,
-    x='first_week_audi',
+    x='top10_group',
     y='total_audi',
-    size='days_in_top10', # 점 크기로 10위권 머문 날수 표현
-    color='genre',
+    color='top10_group',
     hover_name='movieNm',
-    size_max=50,
+    points='all',  # 개별 영화 점을 모두 표시하여 마우스 호버 시 영화명 확인 가능
     title="10위권에 오래 머문 영화는 총 관객도 많은가",
     labels={
-        'first_week_audi': '개봉 첫 주 관객 수(명)',
-        'total_audi': '총 관객 수(명)',
-        'days_in_top10': '10위권에 머문 날수(일)',
-        'genre': '장르'
+        'top10_group': '10위권 머문 기간 구간',
+        'total_audi': '총 관객 수(명)'
     }
 )
 
 # 마우스 오버 툴팁 설정
 fig_q8.update_traces(
-    hovertemplate="<b>%{hovertext}</b><br>개봉 첫 주 관객 수: %{x:,}명<br>총 관객 수: %{y:,}명<br>10위권 머문 날수: %{marker.size}일"
+    hovertemplate="<b>영화명: %{hovertext}</b><br>총 관객 수: %{y:,}명"
 )
 
 fig_q8.update_layout(
-    xaxis_title="개봉 첫 주 관객 수 (명)",
-    yaxis_title="총 관객 수 (명)"
+    xaxis_title="10위권 머문 기간 구간",
+    yaxis_title="총 관객 수 (명)",
+    showlegend=False
 )
 
 st.plotly_chart(fig_q8, use_container_width=True)
 
 st.subheader("💡 이 그래프로 알 수 있는 것")
-st.info("개봉 첫 주 관객 수와 총 관객 수는 매우 강한 양의 상관관계를 나타내며, 총 관객 수가 높을수록(Y축 상단) 10위권에 머문 날수(점의 크기)도 커져 장기 흥행과 높은 총 관객 수가 밀접하게 연관되어 있음을 알 수 있습니다.")
+st.info("10위권에 머문 날수 구간이 길어질수록 상자의 중간값(Median)과 전체적인 관객 수 분포가 뚜렷하게 상승하여, 차트에 장기간 잔류하는 것이 높은 총 관객 수 달성의 핵심 요인임을 파악할 수 있습니다.")
 
 st.divider()
 
